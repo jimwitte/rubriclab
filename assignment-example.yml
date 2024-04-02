@@ -1,0 +1,48 @@
+# Example assignment.yml for Canvas Assignment Creation Script
+# This file outlines the configurations for assignments to be created in Canvas courses.
+# Each entry includes the assignment's name, an optional rubric ID, and various parameters for the assignment.
+# Replace placeholders and add actual details as needed.
+
+- name: Intro to Programming
+  rubric_id: RUBRIC_ID_1  # Replace RUBRIC_ID_1 with the actual rubric ID if applicable
+  params:
+    description: "Assignment focusing on basic programming concepts."
+    submission_types: ['online_text_entry']
+    grading_type: 'points'
+    points_possible: 100
+    published: true
+
+- name: Data Analysis Project
+  rubric_id: RUBRIC_ID_2  # Replace RUBRIC_ID_2 with the actual rubric ID if applicable
+  params:
+    description: "Comprehensive data analysis report based on provided datasets."
+    submission_types: ['online_upload']
+    grading_type: 'points'
+    points_possible: 100
+    published: true
+
+- name: Web Development Exercise
+  rubric_id: RUBRIC_ID_3  # Optional, omit or replace RUBRIC_ID_3 with the actual rubric ID
+  params:
+    description: "Create a responsive website using HTML, CSS, and JavaScript."
+    submission_types: ['online_upload']
+    grading_type: 'points'
+    points_possible: 100
+    published: true
+
+- name: Reflective Essay
+  rubric_id: RUBRIC_ID_4  # Optional, omit or replace RUBRIC_ID_4 with the actual rubric ID
+  params:
+    description: "Reflective essay on learning experiences throughout the course."
+    submission_types: ['online_text_entry']
+    grading_type: 'letter_grade'
+    points_possible: 100
+    published: true
+
+# Notes:
+# - The `rubric_id` is optional and should be used if you wish to associate the assignment with a specific rubric.
+# - `submission_types` can vary based on the assignment's requirements (e.g., 'online_text_entry', 'online_upload').
+# - The `grading_type` determines how the assignment is graded (e.g., 'points', 'letter_grade').
+# - Set `published` to true if the assignment should be immediately available to students.
+
+# This example file is intended for demonstration purposes. Please customize the assignments according to the specific needs of your courses.

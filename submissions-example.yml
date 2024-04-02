@@ -1,0 +1,27 @@
+# Example submissions.yml for Assignment Submission Script
+# This file contains a list of submissions to be made for assignments. Each submission includes
+# the user's SIS login ID and the parameters for the submission.
+# Replace placeholder values with actual data before using.
+
+- sis_login_id: 'user001'
+  submission_params:
+    submission_type: 'online_text_entry'
+    body: |
+      <h2>Introduction to Programming Reflection</h2>
+      <p>As a new student in the programming course, I've been introduced to Python, a powerful yet intuitive programming language. This journey has been enlightening, revealing the logic and structure behind computer programs. My goal is to apply these skills to solve real-world problems, starting with simple automation tasks.</p>
+
+- sis_login_id: 'user002'
+  submission_params:
+    submission_type: 'online_text_entry'
+    body: |
+      <h2>Data Analysis Insights</h2>
+      <p>The world of data analysis has opened my eyes to the impactful decisions driven by data. Through this course, I've learned how to extract meaningful insights from datasets using statistical tools and visualizations. My reflection on this process underscores the importance of critical thinking and the application of analytical skills in diverse fields.</p>
+
+- sis_login_id: 'user003'
+  submission_params:
+    submission_type: 'online_text_entry'
+    body: |
+      <h2>Reflection on Learning Web Development</h2>
+      <p>Embarking on the journey of web development, I've encountered both challenges and achievements. Understanding the fundamentals of HTML, CSS, and JavaScript has empowered me to create interactive websites. This reflection serves as a commitment to further explore the depths of web development, with a focus on user experience and design principles.</p>
+
+# Note: The `sis_login_id` should correspond to the user's identifier in the Canvas system. The `submission_params` should match the requirements of the assignment being submitted to. This example file uses generic content for demonstration purposes. Please tailor the `body` of each submission to fit the specific assignment criteria and student experiences.

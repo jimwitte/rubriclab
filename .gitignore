@@ -1,3 +1,9 @@
+.env
+assignment.yml
+submissions.yml
+courses.yml
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

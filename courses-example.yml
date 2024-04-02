@@ -1,0 +1,22 @@
+# Example courses.yml for Course Assignment Creation Script
+# This file contains a list of courses for which the script will create assignments.
+# Please replace the placeholder values with actual data before using.
+
+- name: Python Programming Basics
+  canvas_id: COURSE_ID_1  # Replace COURSE_ID_1 with the actual Canvas course ID
+  num_create_assignments: 2  # Number of assignments to create for this course
+
+- name: Data Science Introduction
+  canvas_id: COURSE_ID_2  # Replace COURSE_ID_2 with the actual Canvas course ID
+  num_create_assignments: 3  # Number of assignments to create for this course
+
+- name: Web Development Fundamentals
+  canvas_id: COURSE_ID_3  # Replace COURSE_ID_3 with the actual Canvas course ID
+  num_create_assignments: 4  # Number of assignments to create for this course
+
+- name: Advanced Machine Learning
+  canvas_id: COURSE_ID_4  # Replace COURSE_ID_4 with the actual Canvas course ID
+  num_create_assignments: 1  # Number of assignments to create for this course
+
+# Note: The `canvas_id` should be the numeric ID assigned by Canvas to each course.
+# The `num_create_assignments` indicates how many assignments the script should attempt to create for each listed course.
