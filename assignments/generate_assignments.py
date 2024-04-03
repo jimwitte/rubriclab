@@ -1,31 +1,31 @@
 """
-This script automates the process of creating and setting up example assignments for grading practice in multiple courses on Canvas LMS (Learning Management System). 
-It reads course and assignment configurations from YAML files and uses the Canvas API to create assignments with specified parameters
-and associate them with rubrics if provided.
+Script: Create Example Assignments for Grading Practice
+Description:
+    Automates the setup of example assignments for grading practice across multiple Canvas LMS courses.
+    It utilizes course and assignment configurations defined in YAML files to create assignments
+    with specific parameters and associates them with rubrics when provided.
 
 Prerequisites:
-- A Canvas API URL and API key are required for authentication and must be set as environment variables (`CANVAS_API_URL` and `CANVAS_API_KEY`).
-- The `canvasapi` Python package must be installed to interact with the Canvas API.
-- Two YAML configuration files are needed:
-  - `courses.yml`: Specifies the list of courses with their Canvas IDs and the number of assignments to create for each course. Each entry should include `canvas_id`, `name`, and optionally `num_create_assignments` which defaults to 1 if not specified.
-  - `assignment.yml`: Contains the assignment parameters for creation. Each assignment can include a name, parameters for the assignment (`params`), and an optional `rubric_id` for rubric association. The `params` key should include assignment details like description, submission types, grading type, points possible, and published status.
+    - Canvas LMS API URL and API key set as environment variables (CANVAS_API_URL and CANVAS_API_KEY).
+    - 'canvasapi', 'pyyaml', and 'python-dotenv' Python packages installed.
+    - courses.yml: Lists courses with Canvas IDs and the number of assignments to create for each.
+    - assignment.yml: Defines parameters for each assignment, including optional rubric IDs.
 
-Operations performed by the script:
-1. Validates the presence of required environment variables.
-2. Loads course and assignment configurations from the `courses.yml` and `assignment.yml` files.
-3. Iterates over each course listed in `courses.yml`:
-   a. Retrieves the course from Canvas using its Canvas ID.
-   b. Fetches existing assignments to prevent duplicate creations.
-   c. For each assignment configuration in `assignment.yml`, creates a specified number of assignments based on `num_create_assignments` and associates them with a rubric if `rubric_id` is provided.
-   d. Logs the creation of assignments and any errors encountered during the process, such as issues fetching courses, creating assignments, or associating rubrics.
+Operations:
+    1. Validates the presence of necessary environment variables.
+    2. Loads configurations from courses.yml and assignment.yml.
+    3. For each course:
+       a. Retrieves the course by Canvas ID.
+       b. Checks for existing assignments to avoid duplicates.
+       c. Creates assignments as defined, associating them with rubrics if specified.
+       d. Reports on the creation process and handles any errors encountered.
 
 Usage:
-1. Ensure that `canvasapi`, `pyyaml`, and `python-dotenv` packages are installed.
-2. Set the `CANVAS_API_URL` and `CANVAS_API_KEY` environment variables.
-3. Prepare the `courses.yml` and `assignment.yml` configuration files according to the specified format.
-4. Run the script in an environment where Python 3 and the required packages are installed.
+    Ensure all prerequisites are met, set the environment variables, prepare the configuration files,
+    and run the script in an environment with Python 3 and the required packages.
 
-Note: This script assumes that the Canvas API URL and key provided have sufficient permissions to create assignments and enroll users in the specified courses.
+Note:
+    Assumes sufficient permissions for assignment creation and rubric association via the provided API key.
 """
 
 import yaml
@@ -34,86 +34,82 @@ from dotenv import load_dotenv
 from canvasapi import Canvas
 from canvasapi.exceptions import CanvasException
 
+# Configuration file paths
 ASSIGNMENT_PARAMS_FILE = "assignment.yml"
 COURSES_FILE = "courses.yml"
 
-# Load environment variables for API access
+# Load and verify API access environment variables
 load_dotenv()
 CANVAS_API_KEY = os.environ.get("CANVAS_API_KEY")
 CANVAS_API_URL = os.environ.get("CANVAS_API_URL")
 
 if not CANVAS_API_URL or not CANVAS_API_KEY:
     print(
-        "Required environment variables (CANVAS_API_URL or CANVAS_API_KEY) are not set."
+        "Error: Canvas API URL or API Key not set. Please check your environment variables."
     )
     exit(1)
 
+# Load course and assignment configurations from YAML files
 try:
     with open(COURSES_FILE, "r") as file:
         course_list = yaml.load(file, Loader=yaml.FullLoader)
-except FileNotFoundError:
-    print(f"File {COURSES_FILE} not found.")
-    exit(1)
-except yaml.YAMLError as e:
-    print(f"Error parsing the YAML file: {e}")
+except Exception as e:
+    print(f"Failed to load courses configuration: {e}")
     exit(1)
 
 try:
     with open(ASSIGNMENT_PARAMS_FILE, "r") as file:
         assignment_list = yaml.load(file, Loader=yaml.FullLoader)
-except FileNotFoundError:
-    print(f"File {ASSIGNMENT_PARAMS_FILE} not found.")
-    exit(1)
-except yaml.YAMLError as e:
-    print(f"Error parsing the YAML file: {e}")
+except Exception as e:
+    print(f"Failed to load assignment configuration: {e}")
     exit(1)
 
+# Initialize Canvas API
 canvas = Canvas(CANVAS_API_URL, CANVAS_API_KEY)
 
+# Process each course for assignment creation
 for course_info in course_list:
-    course_canvas_id = course_info["canvas_id"]
-    course_name = course_info["name"]
-    num_create_assignments = course_info.get("num_create_assignments", 1)
-
     try:
-        course = canvas.get_course(course_canvas_id)
-    except CanvasException as e:
-        print(f"Error getting course {course_name} (ID: {course_canvas_id}): {e}")
-        continue
+        course = canvas.get_course(course_info["canvas_id"])
 
-    existing_assignments = [assignment.name for assignment in course.get_assignments()]
+        # Ensure necessary sections exist and create them if not
+        # Enhances clarity on section handling before assignment creation
+        required_sections = [
+            course_info.get("test_student_section_name", "Test Students"),
+            course_info.get("grader_section_name", "Graders"),
+        ]
+        existing_sections = {section.name: section for section in course.get_sections()}
 
-    for assignment in assignment_list:
-        assignment_base_name = assignment.get("name", "Assignment")
-        assignment_rubric_id = assignment.get("rubric_id", None)
-        for i in range(1, num_create_assignments + 1):
-            assignment_name = f"{assignment_base_name}{i}"
-            if assignment_name in existing_assignments:
-                print(
-                    f"Assignment {assignment_name} already exists in {course_name}, skipping creation."
-                )
-                continue
+        for section_name in required_sections:
+            if section_name not in existing_sections:
+                course.create_course_section(course_section={"name": section_name})
+                print(f"Created section: {section_name} in {course_info['name']}")
 
-            assignment_params = assignment.get("params", {}).copy()
-            assignment_params["name"] = assignment_name
-
-            try:
-                new_assignment = course.create_assignment(assignment=assignment_params)
-                if assignment_rubric_id:
-                    course.create_rubric_association(
-                        rubric_association={
-                            "rubric_id": assignment_rubric_id,
-                            "association_id": new_assignment.id,
-                            "use_for_grading": True,
-                            "association_type": "Assignment",
-                            "purpose": "grading",
-                            "bookmarked": False,
-                        }
+        # Create assignments as specified, avoiding duplicates
+        existing_assignments = [
+            assignment.name for assignment in course.get_assignments()
+        ]
+        for assignment in assignment_list:
+            for i in range(1, course_info.get("num_create_assignments", 1) + 1):
+                assignment_name = f"{assignment.get('name', 'Assignment')}{i}"
+                if assignment_name not in existing_assignments:
+                    assignment_params = assignment.get("params", {}).copy()
+                    assignment_params["name"] = assignment_name
+                    new_assignment = course.create_assignment(
+                        assignment=assignment_params
                     )
-                print(
-                    f"Created and associated rubric for assignment: {assignment_name} in {course_name}"
-                )
-            except CanvasException as e:
-                print(
-                    f"Error creating assignment {assignment_name} in {course_name} or associating rubric: {e}"
-                )
+                    # Associate with a rubric if specified
+                    if "rubric_id" in assignment:
+                        course.create_rubric_association(
+                            rubric_association={
+                                "rubric_id": assignment["rubric_id"],
+                                "association_id": new_assignment.id,
+                                "use_for_grading": True,
+                                "association_type": "Assignment",
+                                "purpose": "grading",
+                                "bookmarked": False,
+                            }
+                        )
+                    print(f"Created: {assignment_name} in {course_info['name']}")
+    except Exception as e:
+        print(f"An error occurred with {course_info['name']}: {e}")
